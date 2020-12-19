@@ -15,3 +15,10 @@ library(maxLik)
 result=maxLik(GPL.lik,method="nr",start=c(1,2.724743),y=y,gradtol=0.000001)
 summary(result)
 
+#GPLL MOdel
+PQL.lik=function(par,y,X){
+  b=par[1:k]
+  t=par[k+1]
+  niu=X%*%b
+  ((n*log(t/(t+1)))+(sum(log(gamma(y+(((exp(niu))*t*(t+1)-1)/(t+1))))-log(gamma(1+(((exp(niu))*t*(t+1)-1)/(t+1))))))-(sum(log(factorial(y))))+(sum((((exp(niu))*t*(t+1)-1)/(t+1))*log(t/(t+1))))-(sum((y+1)*log(t+1)))+(sum(log(((exp(niu))*t*(t+1))-1+y+((((exp(niu))*t*(t+1))-1)/(t+1))))))
+}
