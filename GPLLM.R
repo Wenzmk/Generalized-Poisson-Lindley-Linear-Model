@@ -43,3 +43,10 @@ shapeof(X)
 start=(c(rep(0,29),1.44154))
 b=par[1:k]
 as.matrix(X) %*% b
+
+#Pemodelan Poisson Linear Model
+library(MASS)
+y=data$`claim_frequency`
+b=glm(y~X[,-1], data=data, poisson(link="log"))
+summary(b)
+logLik(b)
