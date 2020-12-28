@@ -1,0 +1,207 @@
+> #input data
+> data=read.delim("clipboard")
+> variable.names(data)
+ [1] "brand" "use"      "claim_frequency" "vehicle_age"  "DPengg1"        
+ [6] "DPengg2"         "DPengg3"         "DPengg4"         "DPengg5"         "DMerk1"         
+[11] "DMerk2"          "DMerk3"          "DMerk4"          "DMerk5"          "DMerk6"         
+[16] "DMerk7"          "DMerk8"          "DMerk9"          "DMerk10"         "DMerk11"        
+[21] "DMerk12"         "DMerk13"         "DMerk14"         "DMerk15"         "DMerk16"        
+[26] "DMerk17"         "DMerk18"         "DMerk19"         "DMerk20"         "DMerk21"        
+[31] "DMerk22"
+
+> #Generalized Poisson-Lindley Distribution Parameter Estimation
+> n=nrow(data)
+> y=data$`claim_frequency`
+> GPL.lik=function(par,y){
++   a=par[1]
++   t=par[2]
++   (n*(a+1)*log(t/(t+1))+sum(log(gamma(y+a))-log(gamma(a+1)))+sum(log(a+(y+a)/(t+1)))-sum(log(factorial(y)))-sum(y*log(t+1)))
++ }
+> library(maxLik)
+> result=maxLik(GPL.lik,method="nr",start=c(1,2.724743),y=y,gradtol=0.000001)
+There were 49 warnings (use warnings() to see them)
+> summary(result)
+--------------------------------------------
+Maximum Likelihood estimation
+Newton-Raphson maximisation, 6 iterations
+Return code 2: successive function values within tolerance limit
+Log-Likelihood: -5660.55 
+2  free parameters
+Estimates:
+     Estimate Std. error t value  Pr(> t)    
+[1,]  0.26165    0.03221   8.122 4.59e-16 ***
+[2,]  1.44154    0.05982  24.099  < 2e-16 ***
+---
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+--------------------------------------------
+
+#Generalized Poisson-Lindley Linear Model Parameter Estimation
+> data=read.delim("clipboard")
+> variable.names(data)
+ [1] "brand" "use"      "claim_frequency" "vehicle_age"  "DPengg1"        
+ [6] "DPengg2"         "DPengg3"         "DPengg4"         "DPengg5"         "DMerk1"         
+[11] "DMerk2"          "DMerk3"          "DMerk4"          "DMerk5"          "DMerk6"         
+[16] "DMerk7"          "DMerk8"          "DMerk9"          "DMerk10"         "DMerk11"        
+[21] "DMerk12"         "DMerk13"         "DMerk14"         "DMerk15"         "DMerk16"        
+[26] "DMerk17"         "DMerk18"         "DMerk19"         "DMerk20"         "DMerk21"        
+[31] "DMerk22"
+
+> n=nrow(data)
+> y=data$`frekuensi klaim`
+> i=1
+> niu=c(rep(0,n))
+> x0=c(rep(1,n))
+> X=as.matrix(cbind(x0,data[,c(-1,-2,-3)]))
+> y=data$`claim_frequency`
+> k=ncol(X)
+> PQL.lik=function(par,y,X){
++   b=par[1:k]
++   t=par[k+1]
++   niu=X%*%b
++   ((n*log(t/(t+1)))+(sum(log(gamma(y+(((exp(niu))*t*(t+1)-1)/(t+1))))-log(gamma(1+(((exp(niu))*t*(t+1)-1)/(t+1))))))-(sum(log(factorial(y))))+(sum((((exp(niu))*t*(t+1)-1)/(t+1))*log(t/(t+1))))-(sum((y+1)*log(t+1)))+(sum(log(((exp(niu))*t*(t+1))-1+y+((((exp(niu))*t*(t+1))-1)/(t+1))))))
++ }
+> library(maxLik)
+> result=maxLik(PQL.lik,method="nr",start=c(rep(0,k),1.44154),y=y,X=X,gradtol=0.000001)
+There were 50 or more warnings (use warnings() to see the first 50)
+> variable=c("constant",as.vector(variable.names(data[c(-1,-2,-3)])),"teta")
+> coef_estimation=cbind(variabel,result$estimate)
+> list(summary(result),coef_estimation)
+[[1]]
+--------------------------------------------
+Maximum Likelihood estimation
+Newton-Raphson maximisation, 81 iterations
+Return code 2: successive function values within tolerance limit
+Log-Likelihood: -5700.265 
+30  free parameters
+Estimates:
+       Estimate Std. error t value Pr(> t)    
+ [1,]  0.221472   0.194201   1.140 0.25411    
+ [2,]  0.007239   0.013296   0.544 0.58614    
+ [3,] -0.506463   0.252946  -2.002 0.04526 *  
+ [4,] -0.672774   0.228841  -2.940 0.00328 ** 
+ [5,] -0.994245   0.320153  -3.106 0.00190 ** 
+ [6,]  0.668471   0.710651   0.941 0.34689    
+ [7,] -1.163735   1.018101  -1.143 0.25302    
+ [8,] -0.941337   0.455947  -2.065 0.03896 *  
+ [9,] -0.181810   0.350775  -0.518 0.60424    
+[10,] -0.159449   0.252210  -0.632 0.52725    
+[11,] -0.748447   0.260582  -2.872 0.00408 ** 
+[12,] -0.533825   0.301135  -1.773 0.07628 .  
+[13,] -0.515297   1.034566  -0.498 0.61843    
+[14,] -0.428539   0.165838  -2.584 0.00976 ** 
+[15,] -0.456085   0.392071  -1.163 0.24472    
+[16,] -0.376450   0.764292  -0.493 0.62233    
+[17,] -0.100028   0.561789  -0.178 0.85868    
+[18,] -0.718432   1.171078  -0.613 0.53956    
+[19,] -0.131418   0.239036  -0.550 0.58247    
+[20,] -0.236527   0.187934  -1.259 0.20819    
+[21,] -0.069393   0.212974  -0.326 0.74455    
+[22,] -0.592501   0.628482  -0.943 0.34581    
+[23,] -0.360321   0.158775  -2.269 0.02324 *  
+[24,] -0.587444   0.296868  -1.979 0.04784 *  
+[25,] -0.935778   0.703079  -1.331 0.18320    
+[26,] -0.372433   0.205339  -1.814 0.06972 .  
+[27,] -0.438590   0.163714  -2.679 0.00738 ** 
+[28,]  0.175341   0.571607   0.307 0.75903    
+[29,] -0.477715   0.192086  -2.487 0.01288 *  
+[30,]  1.636096   0.075458  21.682 < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+--------------------------------------------
+
+[[2]]
+      variable                              
+ [1,] "constant"      "0.221472173397745"  
+ [2,] "vehicle_age" "0.00723892240775475"
+ [3,] "DPengg1"        "-0.506462516734827" 
+ [4,] "DPengg2"        "-0.672773990392837" 
+ [5,] "DPengg3"        "-0.994245058677459" 
+ [6,] "DPengg4"        "0.668471151678697"  
+ [7,] "DPengg5"        "-1.16373488920918"  
+ [8,] "DMerk1"         "-0.941337060094882" 
+ [9,] "DMerk2"         "-0.181810056518977" 
+[10,] "DMerk3"         "-0.159448943186937" 
+[11,] "DMerk4"         "-0.748446937647152" 
+[12,] "DMerk5"         "-0.533824524966605" 
+[13,] "DMerk6"         "-0.515297222916629" 
+[14,] "DMerk7"         "-0.428539432202643" 
+[15,] "DMerk8"         "-0.456084574952964" 
+[16,] "DMerk9"         "-0.376449749690908" 
+[17,] "DMerk10"        "-0.100027769962593" 
+[18,] "DMerk11"        "-0.718432411407395" 
+[19,] "DMerk12"        "-0.13141794585874"  
+[20,] "DMerk13"        "-0.236527361769702" 
+[21,] "DMerk14"        "-0.0693934595534451"
+[22,] "DMerk15"        "-0.592500605951735" 
+[23,] "DMerk16"        "-0.360321053158313" 
+[24,] "DMerk17"        "-0.58744403879655"  
+[25,] "DMerk18"        "-0.935777897601131" 
+[26,] "DMerk19"        "-0.372432851041742" 
+[27,] "DMerk20"        "-0.438589633320722" 
+[28,] "DMerk21"        "0.175340923415246"  
+[29,] "DMerk22"        "-0.477715211217348" 
+[30,] "teta"           "1.63609592650993"   
+
+> AIC(hasil)
+[1] 11460.53
+attr(,"df")
+[1] 30
+
+
+> #Modeling Poisson Linear Model
+> library(MASS)
+> b=glm(y~X[,-1], data=data, poisson(link="log"))
+> summary(b)
+
+Call:
+glm(formula = y ~ X[, -1], family = poisson(link = "log"), data = data)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.3913  -0.9986  -0.8685   0.2389   5.1788  
+
+Coefficients:
+                        Estimate Std. Error z value Pr(>|z|)    
+(Intercept)           -2.843e+00  8.195e-01  -3.469 0.000522 ***
+X[, -1]vehicle_age    -1.624e-01  1.420e-02 -11.437  < 2e-16 ***
+X[, -1]DPengg1         1.388e+00  7.208e-01   1.925 0.054193 .  
+X[, -1]DPengg2         2.182e+00  7.090e-01   3.077 0.002090 ** 
+X[, -1]DPengg3         3.608e-01  8.201e-01   0.440 0.659988    
+X[, -1]DPengg4        -1.444e+01  1.989e+03  -0.007 0.994209    
+X[, -1]DPengg5        -1.452e+01  8.578e+02  -0.017 0.986492    
+X[, -1]DMerk1          1.271e-01  5.075e-01   0.250 0.802321    
+X[, -1]DMerk2          7.590e-01  4.586e-01   1.655 0.097896 .  
+X[, -1]DMerk3          3.535e-01  4.683e-01   0.755 0.450309    
+X[, -1]DMerk4         -1.622e+01  3.460e+02  -0.047 0.962607    
+X[, -1]DMerk5         -2.088e-01  5.819e-01  -0.359 0.719724    
+X[, -1]DMerk6         -1.591e+01  1.357e+03  -0.012 0.990646    
+X[, -1]DMerk7          2.903e-01  4.107e-01   0.707 0.479716    
+X[, -1]DMerk8          3.789e-01  5.002e-01   0.757 0.448811    
+X[, -1]DMerk9         -1.594e+01  1.224e+03  -0.013 0.989607    
+X[, -1]DMerk10         9.536e-01  5.273e-01   1.809 0.070520 .  
+X[, -1]DMerk11         5.622e-01  8.166e-01   0.688 0.491138    
+X[, -1]DMerk12         5.513e-01  4.371e-01   1.261 0.207207    
+X[, -1]DMerk13         2.854e-01  4.183e-01   0.682 0.495041    
+X[, -1]DMerk14         5.486e-01  4.318e-01   1.270 0.203945    
+X[, -1]DMerk15        -6.083e-03  6.455e-01  -0.009 0.992481    
+X[, -1]DMerk16         1.737e-01  4.113e-01   0.422 0.672792    
+X[, -1]DMerk17        -2.724e-01  5.164e-01  -0.527 0.597871    
+X[, -1]DMerk18        -2.647e-01  7.071e-01  -0.374 0.708129    
+X[, -1]DMerk19        -1.563e+01  2.591e+02  -0.060 0.951898    
+X[, -1]DMerk20         6.036e-01  4.090e-01   1.476 0.140031    
+X[, -1]DMerk21         5.715e-01  6.456e-01   0.885 0.376105    
+X[, -1]DMerk22        -3.889e-01  4.444e-01  -0.875 0.381477    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 8483.5  on 6267  degrees of freedom
+Residual deviance: 7726.3  on 6239  degrees of freedom
+AIC: 11820
+
+Number of Fisher Scoring iterations: 15
+
+> logLik(b)
+'log Lik.' -5881.123 (df=29)
