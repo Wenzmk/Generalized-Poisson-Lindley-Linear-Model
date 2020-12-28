@@ -34,17 +34,13 @@ PQL.lik=function(par,y,X){
 }
 library(maxLik)
 result=maxLik(PQL.lik,method="nr",start=c(rep(0,k),1.44154),y=y,X=X,gradtol=0.000001)
-variabel=c("konstanta",as.vector(variable.names(data[c(-1,-2,-3)])),"teta")
+variable=c("constant",as.vector(variable.names(data[c(-1,-2,-3)])),"teta")
 coef_estimation=cbind(variabel,result$estimate)
 list(summary(result),coef_estimation)
 AIC(result)
-k
-shapeof(X)
-start=(c(rep(0,29),1.44154))
-b=par[1:k]
-as.matrix(X) %*% b
 
-#Pemodelan Poisson Linear Model
+
+#Modeling Poisson Linear Model
 library(MASS)
 y=data$`claim_frequency`
 b=glm(y~X[,-1], data=data, poisson(link="log"))
